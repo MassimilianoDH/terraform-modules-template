@@ -1,0 +1,42 @@
+name: Terraform Module Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  terraform:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.4
+
+      - name: Verify Terraform Version
+        run: terraform --version
+
+      # - name: Set up Cloud SDK with read-only credentials
+      #   if: github.ref != 'refs/heads/master'
+      #   uses: google-github-actions/setup-gcloud@v0
+      #   with:
+      #     service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_READONLY }}
+      #     export_default_credentials: true
+
+      # - name: Set up Cloud SDK with admin credentials
+      #   if: github.ref == 'refs/heads/master'
+      #   uses: google-github-actions/setup-gcloud@v0
+      #   with:
+      #     service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_ADMIN }}
+      #     export_default_credentials: true
+
+      - name: Check Terraform Formatting
+        id: fmt
+        run: terraform fmt -diff -check -no-color -recursive
